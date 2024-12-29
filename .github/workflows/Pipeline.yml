@@ -2,8 +2,8 @@ name: Workflow
 
 on: 
   push:
-  branches: 
-    - feat
+    branches: 
+      - feat
 
 jobs:
   SAST:
