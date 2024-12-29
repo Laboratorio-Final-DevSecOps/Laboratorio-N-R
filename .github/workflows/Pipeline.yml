@@ -1,19 +1,16 @@
-name: Workflow
+name: Build
 on:
   push:
     branches:
       - feat
-  
-  jobs:
-    SAST:
-      runs-on: ubuntu-latest
-    
+jobs:
+  SAST:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-    
-      - name: Realizando análisis
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
