@@ -17,6 +17,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+          
+      - name: Install some-command
+        run: sudo apt-get install -y some-command
 
       - name: Análisis inicial
         env:
