@@ -22,8 +22,8 @@ jobs:
         env: 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           REPO_NAME: ${{ github.event.repository.name }}
-          
-        with:
+        run: |
+          echo: "Realizando análisis"
           args:
             -Dsonar.projectKey=$REPO_NAME \
             -Dsonar.organization=laboratorio-final-devsecops \
