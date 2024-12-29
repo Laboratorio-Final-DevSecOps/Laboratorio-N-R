@@ -24,7 +24,7 @@ jobs:
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
           echo "Realizando análisis inicial en la rama main..."
-            -Dsonar.projectKey=$REPO_NAME \
+            -Dsonar.projectKey=$Laboratorio-Final-DevSecOps_Laboratorio-N-R \
             -Dsonar.organization=laboratorio-final-devsecops \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
