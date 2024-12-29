@@ -5,8 +5,8 @@ on:
       - feat
   
   jobs:
-  SAST:
-    runs-on: ubuntu-latest
+    SAST:
+      runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v4
