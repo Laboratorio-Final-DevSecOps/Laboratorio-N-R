@@ -22,6 +22,7 @@ jobs:
               -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R        
   
   SCA:
+    needs: SAST
     runs-on: ubuntu-24.04
     steps:
     
