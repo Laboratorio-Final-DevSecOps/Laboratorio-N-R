@@ -21,7 +21,30 @@ jobs:
               -Dsonar.organization=laboratorio-final-devsecops
               -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R
   
-    SCA:
-      need: SAST
-      
+    SCA:   
+      -name: SonarCloud Scan
+      runs-on: ubuntu-latest
 
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+          unzip sonar-scanner.zip -d $HOME/sonar-scanner
+          $HOME/sonar-scanner/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
