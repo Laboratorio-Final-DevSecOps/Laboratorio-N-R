@@ -18,8 +18,8 @@ jobs:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
         with:
           args: >
-              -Dsonar.organization=laboratorio-final-devsecops
-              -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R        
+              -Dsonar.organization="laboratorio-final-devsecops"
+              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"        
   
   SCA:
     needs: SAST
