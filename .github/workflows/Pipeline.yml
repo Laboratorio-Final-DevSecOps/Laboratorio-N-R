@@ -38,7 +38,7 @@ jobs:
             echo "El proyecto no cumple con el Quality Gate: $qualityGateStatus."
             echo "Verificando vulnerabilidades críticas..."
             vulnerabilities=$(curl -s -u "$SONAR_TOKEN:" \
-              "https://sonarcloud.io/api/issues/search?componentKeys=$REPO_NAME&types=VULNERABILITY&severities=CRITICAL,BLOCKER" | jq -r '.total')
+              "https://sonarcloud.io/api/issues/search?componentKeys=$REPO_NAME&types=VULNERABILITY&severities=CRITICAL,BLOCKER,MAJOR,MINOR" | jq -r '.total')
 
             if [ "$vulnerabilities" -gt 0 ]; then
               echo "Se encontraron $vulnerabilities vulnerabilidades críticas. El proyecto no cumple con los estándares de seguridad."
@@ -47,3 +47,4 @@ jobs:
           else
             echo "El proyecto cumple con el Quality Gate y no tiene vulnerabilidades críticas. Continuando sin problemas."
           fi
+          
