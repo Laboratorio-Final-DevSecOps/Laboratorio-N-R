@@ -47,3 +47,5 @@ jobs:
           else
             echo "El proyecto cumple con el Quality Gate y no tiene vulnerabilidades críticas. Continuando sin problemas."
           fi
+
+          
