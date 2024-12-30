@@ -20,30 +20,17 @@ jobs:
           args: >
               -Dsonar.organization="laboratorio-final-devsecops"
               -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"        
-  
-  SCA:
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Dependency Check
-      uses: dependency-check/Dependency-Check_Action@1.1.0
-      env:
-        JAVA_HOME: /opt/jdk
-      id: Depcheck
-      with:
-        project: '${{ github.event.repository.name }}'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --out ./reports
-          --failOnCVSS 7
-          --enableRetired
+      
+      - name: SonarQube Server Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          pollingTimeoutSec: 300
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload Test Result
-      uses: actions/upload-artifact@master
-      with:
-        name: Depcheck Report
-        path: ./reports
+      # Optionally you can use the output from the Quality Gate in another step.
+      # The possible outputs of the `quality-gate-status` variable are `PASSED`, `WARN` or `FAILED`.
+      - name: "Example show SonarQube Server Quality Gate Status value"
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+        
