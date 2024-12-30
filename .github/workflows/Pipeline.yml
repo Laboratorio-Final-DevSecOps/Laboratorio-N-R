@@ -21,19 +21,7 @@ jobs:
               -Dsonar.organization=laboratorio-final-devsecops
               -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R
   
-  SCA:
-    name: Análisis de dependencia
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -
-
-      - name: Run SCA Analysis
-        run: |
-          trivy fs --scanners vuln .
+    SCA:
+      need: SAST
+      
 
