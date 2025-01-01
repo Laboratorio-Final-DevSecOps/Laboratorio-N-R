@@ -89,5 +89,5 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
-        format: 'table'
+        format: 'HTML'
 
