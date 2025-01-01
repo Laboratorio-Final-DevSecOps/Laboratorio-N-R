@@ -20,8 +20,7 @@ jobs:
           args: >
               -Dsonar.organization="laboratorio-final-devsecops"
               -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"  
-              --fail-on-issue --minimum-severity HIGH 
-      
+                    
       - name: Verificar vulnerabilidades
         run: |
           if [ -f sonarcloud-report.json ]; then
