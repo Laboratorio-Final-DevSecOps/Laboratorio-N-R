@@ -1,37 +1,28 @@
 name: Workflow
+
 on:
-  push: 
+  push:
     branches:
-        - main
+      - main
 
 jobs:
   SAST:
     runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v3
-        with: 
-            fetch-depth: 0
-      - name: SonarCloud Scan
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v2
+
+      - name: Análisis de seguridad
         uses: Sonarsource/sonarcloud-github-action@master
         env:
-            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
-        with:
-          args: >
-              -Dsonar.organization="laboratorio-final-devsecops"
-              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"  
-                    
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONARCLOUD_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONARCLOUD_ORG: laboratorio-final-devsecops
+          SONARCLOUD_PROJECT: Laboratorio-Final-DevSecOps_Laboratorio-N-R
+
       - name: Verificar vulnerabilidades
         run: |
-          if [ -f sonarcloud-report.json ]; then
-            vulnerabilities=$(jq '.issues[] | select(.severity == "HIGH" or .severity == "MEDIUM" or .severity == "CRITICAL")' sonarcloud-report.json)
-            if [ -n "$vulnerabilities" ]; then
-              echo "Se detectaron vulnerabilidades altas, medias o críticas."
-              exit 1
-            fi
+          if [ $(sonarcloud status -f) -eq 1 ]; then
+            echo "Se detectaron vulnerabilidades altas, medias o críticas."
+            exit 1
           fi
-
-        
-
-              
-  
