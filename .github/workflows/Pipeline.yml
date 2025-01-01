@@ -20,16 +20,31 @@ jobs:
           args: >
               -Dsonar.organization="laboratorio-final-devsecops"
               -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"   
-      
-      - name: Check quality gate status
-        run: |
-          echo "Checking SonarCloud Quality Gate status..."
-          QUALITY_GATE_STATUS=$(curl -s -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=<Laboratorio-Final-DevSecOps_Laboratorio-N-R>" \
-          -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" | jq -r '.projectStatus.status')
 
-          if [ "$QUALITY_GATE_STATUS" != "OK" ]; then
-            echo "Quality Gate failed: $QUALITY_GATE_STATUS"
-            exit 1
+      - name: Validate Quality Gate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "Validando el estado del Quality Gate..."
+          analysisId=$(curl -s -u "$SONAR_TOKEN:" \
+            "https://sonarcloud.io/api/ce/component?component=$REPO_NAME" | jq -r '.current.analysisId')
+
+          qualityGateStatus=$(curl -s -u "$SONAR_TOKEN:" \
+            "https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId" | jq -r '.projectStatus.status')
+
+          if [ "$qualityGateStatus" != "OK" ]; then
+            echo "El proyecto no cumple con el Quality Gate: $qualityGateStatus."
+            echo "Verificando vulnerabilidades críticas..."
+            vulnerabilities=$(curl -s -u "$SONAR_TOKEN:" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=$REPO_NAME&types=VULNERABILITY=CRITICAL,MEDIUM,HICH" | jq -r '.total')
+
+            if [ "$vulnerabilities" -gt 0 ]; then
+              echo "Se encontraron $vulnerabilities vulnerabilidades críticas. El proyecto no cumple con los estándares de seguridad."
+              exit 1
+            fi
           else
-            echo "Quality Gate passed: $QUALITY_GATE_STATUS"
+            echo "El proyecto cumple con el Quality Gate y no tiene vulnerabilidades críticas. Continuando sin problemas."
           fi
+
+ 
