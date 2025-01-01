@@ -21,9 +21,16 @@ jobs:
               -Dsonar.organization="laboratorio-final-devsecops"
               -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"    
               
-      - name: Check Quality Gate
+      - name: Check Quality Gate Status
         run: |
-          curl -u ${{ secrets.SONAR_TOKEN }} \
-          "$SONAR_HOST_URL/api/qualitygates/project_status?projectKey=Laboratorio-N-R" \
-          | jq -e '.projectStatus.status == "OK"' || exit 1
-  
+          echo "Checking SonarCloud Quality Gate status..."
+          QUALITY_GATE_STATUS=$(curl -s -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R \
+          -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" | jq -r '.projectStatus.status')
+
+          if [ "$QUALITY_GATE_STATUS" != "OK" ]; then
+            echo "Quality Gate failed: $QUALITY_GATE_STATUS"
+            exit 1
+          else
+            echo "Quality Gate passed: $QUALITY_GATE_STATUS"
+          fi
+          
