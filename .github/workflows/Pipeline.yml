@@ -19,82 +19,11 @@ jobs:
         with:
           args: >
               -Dsonar.organization="laboratorio-final-devsecops"
-              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"   
-  SCA:
-    needs: SAST
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Dependency Check
-      uses: dependency-check/Dependency-Check_Action@1.1.0
-      env:
-        JAVA_HOME: /opt/jdk
-      id: Depcheck
-      with:
-        project: '${{ github.event.repository.name }}'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --out ./reports
-          --failOnCVSS 7
-          --enableRetired
-
-    - name: Upload Test Result
-      uses: actions/upload-artifact@master
-      with:
-        name: Depcheck Report
-        path: ./reports
-
-  DockerBuild:
-    needs: SCA
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Docker Login
-      uses: docker/login-action@v3.0.0
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Docker Build
-      run: |
-        docker build --tag emanuelnunezf/laboratorio-n-r:latest .
-
-    - name: Push Docker
-      run: |
-        docker push emanuelnunezf/laboratorio-n-r:latest
-
-  DockerScan:
-    needs: DockerBuild
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Docker Login
-      uses: docker/login-action@v3.0.0
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    
-    - name: Pull Docker
-      run: |
-        docker pull emanuelnunezf/laboratorio-n-r:latest
-
-    - name: Run Trivy Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
-        format: 'table'
-  PRUEBA:
-    needs: DockerScan     
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/trivy-triage
-        with:
-          discussion_num: ${{ github.event.inputs.discussion_num }}
+              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"    
+              
+      - name: Check Quality Gate
+        run: |
+          curl -u ${{ secrets.SONAR_TOKEN }} \
+          "$SONAR_HOST_URL/api/qualitygates/project_status?projectKey=Laboratorio-N-R" \
+          | jq -e '.projectStatus.status == "OK"' || exit 1
+  
