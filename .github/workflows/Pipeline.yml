@@ -44,12 +44,6 @@ jobs:
           --format JSON --out .dependency-check-report.json
           failOnCVSS: 0.0
 
-    - name: Upload Test Result
-      uses: actions/upload-artifact@master
-      with:
-        name: Depcheck Report
-        path: ./reports
-
     - name: Verificar vulnerabilidades
       run: |
           if [ -f .dependency-check-report.json ]; then
@@ -59,3 +53,9 @@ jobs:
               exit 1
             fi
           fi
+      
+    - name: Upload Test Result
+      uses: actions/upload-artifact@master
+      with:
+        name: Depcheck Report
+        path: ./reports     
