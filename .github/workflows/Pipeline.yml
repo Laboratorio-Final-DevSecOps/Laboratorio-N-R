@@ -2,7 +2,7 @@ name: Workflow
 on:
   push: 
     branches:
-        - feat
+        - main
 
 jobs:
   SAST:
@@ -98,4 +98,3 @@ jobs:
       - uses: ./.github/actions/trivy-triage
         with:
           discussion_num: ${{ github.event.inputs.discussion_num }}
-          
