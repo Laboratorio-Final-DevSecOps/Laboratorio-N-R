@@ -17,9 +17,10 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
         with:
-          args: --fail-on-issue --minimum-severity HIGH
+          args: >
               -Dsonar.organization="laboratorio-final-devsecops"
-              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"   
+              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"  
+              --fail-on-issue --minimum-severity HIGH 
       
       - name: Verificar vulnerabilidades
         run: |
