@@ -23,13 +23,13 @@ jobs:
               
       - name: Check quality gate status
         run: |
-          echo "Checking SonarCloud Quality Gate status..."
+          echo "Checking SonarCloud Quality Gate status"
           QUALITY_GATE_STATUS=$(curl -s -X GET "https://sonarcloud.io/api/qualitygates/project_status?projectKey=<Laboratorio-Final-DevSecOps_Laboratorio-N-R>" \
           -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" | jq -r '.projectStatus.status')
 
           if [ "$QUALITY_GATE_STATUS" != "OK" ]; then
-            echo "Quality Gate failed: $QUALITY_GATE_STATUS"
+            echo "Quality Gate failed: "Se detectan vulnerabilidades"
             exit 1
           else
-            echo "Quality Gate passed: $QUALITY_GATE_STATUS"
+            echo "Quality Gate passed: "No se detectan vulnerabilidades"
           fi
