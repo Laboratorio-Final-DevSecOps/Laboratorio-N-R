@@ -9,8 +9,8 @@ jobs:
  
   SCA:
     runs-on: 24.04
-
     steps: 
+      
     - name: Checkout code
       uses: actions/checkout@v2
     
