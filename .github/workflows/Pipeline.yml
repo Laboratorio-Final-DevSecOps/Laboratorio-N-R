@@ -16,10 +16,10 @@ jobs:
         uses: actions/checkout@v3
 
       # 2. Configurar JDK (si es un proyecto Java)
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
 
       # 3. Ejecutar análisis en SonarCloud
       - name: Run SonarCloud Scan
