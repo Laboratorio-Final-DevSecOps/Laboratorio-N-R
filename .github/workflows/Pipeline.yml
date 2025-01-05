@@ -10,7 +10,7 @@ jobs:
   SCA:
     runs-on: 24.04
     steps: 
-      
+
     - name: Checkout code
       uses: actions/checkout@v2
     
@@ -20,10 +20,12 @@ jobs:
         JAVA_HOME: opt/jdk
       id: Depcheck
       with: 
-        project: 'Laboratorio-N-R' 
-        format: 'HTML' 
-        outputDirectory: 'dependency-check-report' 
-        scanPath: './'
+        name: dependency-check-report
+        path: dependency-check-report
+        args: >
+          --out ./reports
+          --failOnCVSS 7
+          --enableRetired
     
     - name: Upload Dependency-Check Report as Artifact
       uses: actions/upload-artifact@v3
