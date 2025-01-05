@@ -11,9 +11,18 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
+        
     - name: SonarQube Scan
       uses: sonarsource/sonarcloud-github-action@v4.0.0 
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
- 
+      with: 
+        args: >
+          -Dsonar.organization=laboratorio-final-devsecops
+          -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.sources=lib/
+          -Dsonar.tests=tests/
+          -Dsonar.test.exclusions=tests/**
+          -Dsonar.verbose=true
+        
