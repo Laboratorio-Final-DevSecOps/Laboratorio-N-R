@@ -1,23 +1,38 @@
-name: Workflow
+name: SonarCloud Analysis
+
 on:
   push:
     branches:
       - main
-
+  
 jobs:
-  SAST:
+  sonarcloud:
+    name: SonarCloud Analysis
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        
-    - name: SonarQube Scan
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }} 
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with: 
-        args: >
-          -Dsonar.organization="laboratorio-final-devsecops"
-          -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"
+      # 1. Configurar el código fuente
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Ejecutar el análisis en SonarCloud
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+          -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R \
+          -Dsonar.organization=laboratorio-final-devsecops \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # 4. Verificar el estado de calidad del análisis
+      - name: Check SonarCloud Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R" | jq -r '.projectStatus.status')
+          if [ "$STATUS" != "OK" ]; then
+            echo "SonarCloud Quality Gate failed: $STATUS"
+            exit 1
+          fi
