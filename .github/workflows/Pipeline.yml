@@ -17,8 +17,9 @@ jobs:
 
       # 2. Ejecutar análisis en SonarCloud
       - name: Run SonarCloud Scan
+        uses: Sonarsource/sonarcloud-github-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
         run: |
           sonar-scanner \
           -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R \
