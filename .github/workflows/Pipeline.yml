@@ -33,7 +33,7 @@ jobs:
           | jq -r '.projectStatus.status')
           echo "SonarCloud Quality Gate Status: $STATUS"
           if [ "$STATUS" != "OK" ]; then
-            echo "❌ SonarCloud Quality Gate failed: $STATUS"
+            echo "SonarCloud Quality Gate failed: $STATUS"
             exit 1
           fi
 
