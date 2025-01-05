@@ -6,7 +6,7 @@ on:
       - main
   
 jobs:
-
+ 
   SCA:
     runs-on: ubuntu-latest
 
@@ -20,8 +20,10 @@ jobs:
         JAVA_HOME: opt/jdk
       id: Depcheck
       with: 
-        output-directory: dependency-check-report
-        fail-build-on-vulnerability-severity: 'major,high,medium'
+        project: 'Laboratorio-N-R' 
+        format: 'HTML' 
+        outputDirectory: 'dependency-check-report' 
+        scanPath: './'
     
     - name: Upload Dependency-Check Report as Artifact
       uses: actions/upload-artifact@v3
@@ -36,5 +38,5 @@ jobs:
             exit 1
         else
           echo "No critical, high, or medium vulnerabilities found."
-        fi
+          fi
 
