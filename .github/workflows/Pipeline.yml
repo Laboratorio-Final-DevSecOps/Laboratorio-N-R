@@ -20,7 +20,7 @@ jobs:
       with: 
         projectBaseDir: app/src
         args: >
-          -Dsonar.organization=laboratorio-final-devsecops
-          -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R
+          -Dsonar.organization="laboratorio-final-devsecops"
+          -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"
         
         
