@@ -1,4 +1,4 @@
-name: CI
+name: SonarCloud SAST Analysis
 
 on:
   push:
@@ -6,34 +6,43 @@ on:
       - main
 
 jobs:
-  build:
+  sonarcloud:
+    name: SonarCloud Analysis
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v2
+      # 1. Checkout del repositorio
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R
-          -Dsonar.organization=laboratorio-final-devsecops
-          -Dsonar.host.url=https://sonarcloud.io
+      # 2. Configurar JDK (si es un proyecto Java)
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+
+      # 3. Ejecutar análisis en SonarCloud
+      - name: Run SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+          -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R \
+          -Dsonar.organization=laboratorio-final-devsecops \
+          -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      
-    - name: Check SonarCloud Quality Gate
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
+
+      # 4. Verificar estado del Quality Gate
+      - name: Check SonarCloud Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
           STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
           "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R" \
           | jq -r '.projectStatus.status')
           echo "SonarCloud Quality Gate Status: $STATUS"
           if [ "$STATUS" != "OK" ]; then
-            echo "SonarCloud Quality Gate failed: $STATUS"
+            echo "❌ SonarCloud Quality Gate failed: $STATUS"
             exit 1
           fi
 
