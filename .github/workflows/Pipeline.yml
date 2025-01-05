@@ -21,5 +21,10 @@ jobs:
         args: >
           -Dsonar.organization="laboratorio-final-devsecops"
           -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.sources=lib/
+          -Dsonar.tests=tests/
+          -Dsonar.test.exclusions=tests/**
+          -Dsonar.verbose=true
         
         
