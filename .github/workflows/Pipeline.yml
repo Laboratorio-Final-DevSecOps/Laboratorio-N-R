@@ -21,7 +21,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
         run: |
-          sonar-scanner \
           -Dsonar.projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R \
           -Dsonar.organization=laboratorio-final-devsecops \
           -Dsonar.host.url=https://sonarcloud.io \
