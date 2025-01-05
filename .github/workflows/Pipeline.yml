@@ -7,7 +7,7 @@ on:
   
 jobs:
   SCA:
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-24.04
 
     steps: 
     
