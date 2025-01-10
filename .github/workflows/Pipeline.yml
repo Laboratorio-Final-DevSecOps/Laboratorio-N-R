@@ -6,7 +6,7 @@ on:
 
 jobs:
   SAST:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps: 
       - uses: actions/checkout@v3
         with: 
@@ -89,7 +89,7 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
-        format: 'xml'
+        format: 'template'
     
   Despliegue:
     needs: DockerScan
