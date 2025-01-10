@@ -102,7 +102,3 @@ jobs:
         username: ${{ secrets.DOCKER_USER }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     
-    - name: Run Docker container
-      run: |
-        docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
- 
