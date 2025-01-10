@@ -104,4 +104,4 @@ jobs:
     
     - name: Run Docker container
       run: |
-        docker run -d lab.final - p 8080:80 
+        docker run -d emanuelnunezf/laboratorio-n-r:latest p 8080:80 
