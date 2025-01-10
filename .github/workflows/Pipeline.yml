@@ -28,27 +28,69 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     
-    - name: Install Dependency-Check
-      run: |
-        curl -sSL https://github.com/jeremylong/DependencyCheck/releases/download/v6.2.2/dependency-check-6.2.2-release.zip -o dependency-check.zip
-        unzip dependency-check.zip -d dependency-check
-        dependency-check/bin/dependency-check.sh --scan . --format HTML --out dependency-check-report
-   
+    - name: Dependency Check
+      uses: dependency-check/Dependency-Check_Action@1.1.0
+      env:
+        JAVA_HOME: /opt/jdk
+      id: Depcheck
+      with:
+        project: '${{ github.event.repository.name }}'
+        path: '.'
+        format: 'HTML'
+        args: >
+          --out ./reports
+          --failOnCVSS 7
+          --enableRetired
+
     - name: Fail on Critical/High/Medium vulnerabilities in Dependency Check
       run: |
-        grep -iE "critical|high|medium" dependency-check-report/*.html && exit 1 || echo "No Critical/High/Medium vulnerabilities found"
+         grep -iE "critical|high|medium" dependency-check-report/*.html && exit 1 || echo "No Critical/High/Medium vulnerabilities found"
+           
+    - name: Upload Test Result
+      uses: actions/upload-artifact@master
+      with:
+        name: Depcheck Report
+        path: ./reports
 
   DockerBuild:
     needs: SCA
     runs-on: ubuntu-24.04
     steps:
     
-    - name: Scan Docker image with Trivy
-      uses: aquasecurity/trivy-action@v0.2.0
-      with: 
-        image: emanuelnunezf/laboratorio-n-r:latest
-        severity: CRITICAL, HIGH, MEDIUM
-    
-    - name: Run Docker container
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Docker Login
+      uses: docker/login-action@v3.0.0
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Docker Build
       run: |
-        docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
+        docker build --tag emanuelnunezf/laboratorio-n-r:latest .
+
+    - name: Push Docker
+      run: |
+        docker push emanuelnunezf/laboratorio-n-r:latest
+
+  DockerScan:
+    needs: DockerBuild
+    runs-on: ubuntu-24.04
+    steps:
+    
+    - name: Docker Login
+      uses: docker/login-action@v3.0.0
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Pull Docker
+      run: |
+        docker pull emanuelnunezf/laboratorio-n-r:latest
+
+    - name: Run Trivy Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
+        format: 'table'
