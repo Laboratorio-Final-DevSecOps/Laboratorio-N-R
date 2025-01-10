@@ -1,34 +1,55 @@
-name: Workflow 
-
+name: Workflow
 on:
-  push:
+  push: 
     branches:
-      - main
-  
-jobs:
- 
-  SCA:
-    runs-on: ubuntu-latest
-    steps: 
-  
-    - name: Dependency Check
-      uses: dependency-check/Dependency-Check_Action@1.1.0
-      env:
-        JAVA_HOME: /opt/jdk
-      id: Depcheck
-      with:
-        project: '${{ github.event.repository.name }}'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --out ./reports
-          --failOnCVSS 7
-          --enableRetired 
+        - feat
 
-    - name: Upload Test Result
-      uses: actions/upload-artifact@master
-      with:
-        name: Depcheck Report
-        path: ./reports
-      
+jobs:
+  SAST:
+    runs-on: ubuntu-24.04
+    steps: 
+      - uses: actions/checkout@v3
+        with: 
+            fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: Sonarsource/sonarcloud-github-action@master
+        env:
+            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
+        with:
+          args: >
+              -Dsonar.organization="laboratorio-final-devsecops"
+              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"   
+  SCA:
+    needs: SAST
+    runs-on: ubuntu-24.04
+    steps:
     
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Dependency-Check
+      run: |
+        curl -sSL https://github.com/jeremylong/DependencyCheck/releases/download/v6.2.2/dependency-check-6.2.2-release.zip -o dependency-check.zip
+        unzip dependency-check.zip -d dependency-check
+        dependency-check/bin/dependency-check.sh --scan . --format HTML --out dependency-check-report
+   
+    - name: Fail on Critical/High/Medium vulnerabilities in Dependency Check
+      run: |
+        grep -iE "critical|high|medium" dependency-check-report/*.html && exit 1 || echo "No Critical/High/Medium vulnerabilities found"
+
+  DockerBuild:
+    needs: SCA
+    runs-on: ubuntu-24.04
+    steps:
+    
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@v0.2.0
+      with: 
+        image: emanuelnunezf/laboratorio-n-r:latest
+        severity: CRITICAL, HIGH, MEDIUM
+    
+  Dockerbuild:
+    - name: Run Docker container
+      run: |
+        docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
