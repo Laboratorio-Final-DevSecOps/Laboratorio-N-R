@@ -89,7 +89,7 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
-        format: 'template'
+        format: 'table'
     
   Despliegue:
     needs: DockerScan
@@ -104,4 +104,5 @@ jobs:
     
     - name: Run Docker container
       run: |
-        docker run -d emanuelnunezf/laboratorio-n-r:latest p 8080:80 
+        docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
+ 
