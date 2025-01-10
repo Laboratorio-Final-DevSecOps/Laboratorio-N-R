@@ -50,6 +50,7 @@ jobs:
         severity: CRITICAL, HIGH, MEDIUM
     
   Dockerbuild:
+    needs: DockerBuild
     - name: Run Docker container
       run: |
         docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
