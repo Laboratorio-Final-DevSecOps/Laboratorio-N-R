@@ -49,8 +49,6 @@ jobs:
         image: emanuelnunezf/laboratorio-n-r:latest
         severity: CRITICAL, HIGH, MEDIUM
     
-  DockerDeploy:
-    needs: DockerBuild
     - name: Run Docker container
       run: |
         docker run -d -p 8080:80 emanuelnunezf/laboratorio-n-r:latest
