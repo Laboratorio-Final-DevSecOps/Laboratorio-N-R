@@ -1,96 +1,26 @@
-name: Workflow
+name: Docker Image
+
 on:
-  push: 
+  push:
     branches:
-        - main
+      - main
 
 jobs:
-  SAST:
-    runs-on: ubuntu-24.04
-    steps: 
-      - uses: actions/checkout@v3
-        with: 
-            fetch-depth: 0
-      - name: SonarCloud Scan
-        uses: Sonarsource/sonarcloud-github-action@master
-        env:
-            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
         with:
-          args: >
-              -Dsonar.organization="laboratorio-final-devsecops"
-              -Dsonar.projectKey="Laboratorio-Final-DevSecOps_Laboratorio-N-R"   
-  SCA:
-    needs: SAST
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Dependency Check
-      uses: dependency-check/Dependency-Check_Action@1.1.0
-      env:
-        JAVA_HOME: /opt/jdk
-      id: Depcheck
-      with:
-        project: '${{ github.event.repository.name }}'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --out ./reports
-          --failOnCVSS 7
-          --enableRetired
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Fail on Critical/High/Medium vulnerabilities in Dependency Check
-      run: |
-         grep -iE "critical|high|medium" dependency-check-report/*.html && exit 1 || echo "No Critical/High/Medium vulnerabilities found"
-           
-    - name: Upload Test Result
-      uses: actions/upload-artifact@master
-      with:
-        name: Depcheck Report
-        path: ./reports
-
-  DockerBuild:
-    needs: SCA
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Docker Login
-      uses: docker/login-action@v3.0.0
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Docker Build
-      run: |
-        docker build --tag emanuelnunezf/laboratorio-n-r:latest .
-
-    - name: Push Docker
-      run: |
-        docker push emanuelnunezf/laboratorio-n-r:latest
-
-  DockerScan:
-    needs: DockerBuild
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Docker Login
-      uses: docker/login-action@v3.0.0
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    
-    - name: Pull Docker
-      run: |
-        docker pull emanuelnunezf/laboratorio-n-r:latest
-
-    - name: Run Trivy Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'emanuelnunezf/laboratorio-n-r:latest'
-        format: 'table'
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/laboratorio-n-r:latest
