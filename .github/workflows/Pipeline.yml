@@ -48,7 +48,7 @@ jobs:
         name: Depcheck Report
         path: ./reports
 
-    DockerBuild:
+  DockerBuild:
       needs: SCA
       runs-on: ubuntu-24.04
       steps:
@@ -70,7 +70,7 @@ jobs:
         run: |
           docker push emanuelnunezf/laboratorio-n-r:latest
 
-    DockerScan:
+  DockerScan:
       needs: DockerBuild
       runs-on: ubuntu-24.04
       steps:
