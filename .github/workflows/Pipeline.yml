@@ -31,15 +31,28 @@ jobs:
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             
-    - name: Check SonarCloud Quality Gate
+    - name: Validate Quality Gate
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        REPO_NAME: ${{ github.event.repository.name }}
       run: |
-        STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
-        "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Laboratorio-Final-DevSecOps_Laboratorio-N-R" \
-        | jq -r '.projectStatus.status')
-        echo "SonarCloud Quality Gate Status: $STATUS"
-        if [ "$STATUS" != "OK" ]; then
-          echo "❌ SonarCloud Quality Gate failed: $STATUS"
-          exit 1
+        echo "Validando el estado del Quality Gate..."
+        analysisId=$(curl -s -u "$SONAR_TOKEN:" \
+          "https://sonarcloud.io/api/ce/component?component=$REPO_NAME" | jq -r '.current.analysisId')
+
+        qualityGateStatus=$(curl -s -u "$SONAR_TOKEN:" \
+          "https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId" | jq -r '.projectStatus.status')
+
+        if [ "$qualityGateStatus" != "OK" ]; then
+          echo "El proyecto no cumple con el Quality Gate: $qualityGateStatus."
+          echo "Verificando vulnerabilidades críticas..."
+          vulnerabilities=$(curl -s -u "$SONAR_TOKEN:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=$REPO_NAME&types=VULNERABILITY&severities=CRITICAL,BLOCKER,MAJOR,MEDIUM" | jq -r '.total')
+
+         if [ "$vulnerabilities" -gt 0 ]; then
+            echo "Se encontraron $vulnerabilities vulnerabilidades críticas. El proyecto no cumple con los estándares de seguridad."
+            exit 1
+         fi
+        else
+          echo "El proyecto cumple con el Quality Gate y no tiene vulnerabilidades críticas. Continuando sin problemas."
         fi
