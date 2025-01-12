@@ -19,10 +19,10 @@ jobs:
       - name: Iniciar sesión en Docker Hub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Etiquetar y empujar la imagen
         run: |
-          docker tag laboratorio-n-r ${{ secrets.DOCKER_USERNAME }}/laboratorio-n-r
-          docker push ${{ secrets.DOCKER_USERNAME }}/laboratorio-n-r
+          docker tag laboratorio-n-r ${{ secrets.DOCKER_USER }}/laboratorio-n-r
+          docker push ${{ secrets.DOCKER_USER }}/laboratorio-n-r
