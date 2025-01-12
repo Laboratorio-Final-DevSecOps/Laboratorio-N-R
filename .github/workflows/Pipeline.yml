@@ -21,7 +21,8 @@ jobs:
         project: '${{ github.event.repository.name }}'
         path: '.'
         format: 'HTML'
-        args: --format JSON --out results.json
+        args: >
+          --format JSON --out results.json
         fail-on: HIGH,MEDIUM,LOW
     
     - name: Verificar vulnerabilidades
